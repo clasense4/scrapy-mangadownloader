@@ -42,8 +42,7 @@ class HeymangaSpider(scrapy.Spider):
             image = img.extract()
             # Append url
             complete_image = self.https + image[2:]
-            logging.info(complete_image)
-            print complete_image
+            #logging.info(complete_image)
 
             # Update image counter
             if self.last_chapter == chapter:
@@ -58,15 +57,15 @@ class HeymangaSpider(scrapy.Spider):
             file_name = complete_image.split('/')[-1]
             extension = complete_image.split('.')[-1]
             image_path = local_save_path + '0' + str(self.image_counter) + '.' + extension
-            # urllib.urlretrieve(complete_image, image_path)
-            # logging.info('Image saved to ' + image_path)
+            urllib.urlretrieve(complete_image, image_path)
+            #logging.info('Image saved to ' + image_path)
 
         # Get next page
         next_page = response.xpath('//a[@class="btn btn-sm"]/@href').extract()
         if len(next_page) > 1:
             next_page = next_page[-1]
             next_page = self.base_url + next_page
-            logging.info(next_page)
+            #logging.info(next_page)
             yield scrapy.Request(next_page, callback=self.parse)
 
     def zipdir(path, ziph):
