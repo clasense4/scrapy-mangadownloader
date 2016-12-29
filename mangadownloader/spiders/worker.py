@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
-from .celery import app
+from mangadownloader.celery import app
 import logging
+import urllib
 
 @app.task
 def download(complete_image_url, local_image_path):
