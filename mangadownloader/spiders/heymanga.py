@@ -20,8 +20,6 @@ class HeymangaSpider(scrapy.Spider):
     base_url = 'https://www.heymanga.me'
     image_counter = 0
     last_chapter = manga[1]
-    # Send the download via celery
-    # app = Celery('hello', broker='amqp://guest@localhost//')
 
     def parse(self, response):
         # create a directory
@@ -60,8 +58,6 @@ class HeymangaSpider(scrapy.Spider):
             extension = complete_image_url.split('.')[-1]
             local_image_path = local_save_path + '0' + str(self.image_counter) + '.' + extension
             download.delay(complete_image_url, local_image_path)
-            # download.delay('x','y')
-            # urllib.urlretrieve(complete_image_url, local_image_path)
             #logging.info('Image saved to ' + local_image_path)
 
         # Get next page
@@ -71,11 +67,4 @@ class HeymangaSpider(scrapy.Spider):
             next_page = self.base_url + next_page
             logging.info(next_page)
             yield scrapy.Request(next_page, callback=self.parse)
-
-    def zipdir(path, ziph):
-        # ziph is zipfile handle
-        for root, dirs, files in os.walk(path):
-            for file in files:
-                ziph.write(os.path.join(root, file))
-
 
