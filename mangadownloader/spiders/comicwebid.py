@@ -10,7 +10,7 @@ from mangadownloader.spiders.worker import download
 class ComicWebIdSpider(scrapy.Spider):
     name = "comicwebid"
     allowed_domains = ["comic.web.id"]
-    manga = ['Samurai_Deeper_Kyo', '34', '1']
+    manga = ['Samurai_Deeper_Kyo', '34', '85']
     http = 'http://'
     base_url = 'http://comic.web.id/'
     start_urls = [
@@ -58,16 +58,16 @@ class ComicWebIdSpider(scrapy.Spider):
             # logging.info(extension)
             local_image_path = local_save_path + '0' + str(self.image_counter) + '.' + extension
             # download.delay(complete_image_url, local_image_path)
-            # urllib.urlretrieve(complete_image_url, local_image_path)
+
             fh = open(local_image_path, 'wb')
             fh.write(self.scraper.get(complete_image_url).content)
             logging.info('IMAGE SAVED TO  = ' + local_image_path)
 
             # Get next page
-            next_page = response.xpath('//div[@class="pager"]/span[3]/a/@href').extract()
+            next_page = response.xpath('//td[@class="mid"]/table/tr[3]/td/a/@href').extract()
             # logging.info(next_page)
-            if len(next_page) > 1:
-                next_page = self.base_url + next_page[1]
+            if len(next_page) > 0:
+                next_page = self.base_url + next_page[0]
             logging.info('NEXT PAGE  = ' + next_page)
             yield scrapy.Request(next_page, callback=self.parse)
         else :
