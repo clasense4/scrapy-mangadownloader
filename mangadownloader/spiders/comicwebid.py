@@ -10,7 +10,7 @@ from mangadownloader.spiders.worker import download
 class ComicWebIdSpider(scrapy.Spider):
     name = "comicwebid"
     allowed_domains = ["comic.web.id"]
-    manga = ['Samurai_Deeper_Kyo', '39', '84']
+    manga = ['Samurai_Deeper_Kyo', '34', '1']
     http = 'http://'
     base_url = 'http://comic.web.id/'
     start_urls = [
@@ -18,9 +18,9 @@ class ComicWebIdSpider(scrapy.Spider):
     ]
     image_counter = 0
     last_chapter = manga[1]
+    scraper = cfscrape.create_scraper()
 
     def parse(self, response):
-        scraper = cfscrape.create_scraper()
 
         # create a directory
         manga_name = response.url.split('/')[3]
@@ -60,15 +60,16 @@ class ComicWebIdSpider(scrapy.Spider):
             # download.delay(complete_image_url, local_image_path)
             # urllib.urlretrieve(complete_image_url, local_image_path)
             fh = open(local_image_path, 'wb')
-            fh.write(scraper.get(complete_image_url).content)
+            fh.write(self.scraper.get(complete_image_url).content)
             logging.info('IMAGE SAVED TO  = ' + local_image_path)
 
             # Get next page
-            next_page = response.xpath('//div[@class="pager"]/span[3]/a[2]/@href').extract()
+            next_page = response.xpath('//div[@class="pager"]/span[3]/a/@href').extract()
+            # logging.info(next_page)
             if len(next_page) > 1:
-                next_page = self.base_url + next_page[0]
-                # logging.info(next_page)
-                yield scrapy.Request(next_page, callback=self.parse)
+                next_page = self.base_url + next_page[1]
+            logging.info('NEXT PAGE  = ' + next_page)
+            yield scrapy.Request(next_page, callback=self.parse)
         else :
             # Images not found, so exit
             # os.sys.exit()
